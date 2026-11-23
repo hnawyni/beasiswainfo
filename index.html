@@ -1,0 +1,1477 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BloomEdu | Portal Informasi Beasiswa SMA & Kuliah</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Plus Jakarta Sans & Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        bloomPink: {
+                            50: '#FDF2F8',
+                            100: '#FCE7F3',
+                            200: '#FBCFE8',
+                            300: '#F9A8D4',
+                            400: '#F472B6',
+                            500: '#EC4899',
+                            600: '#DB2777',
+                            700: '#BE185D',
+                        },
+                        bloomGreen: {
+                            50: '#ECFDF5',
+                            100: '#D1FAE5',
+                            200: '#A7F3D0',
+                            300: '#6EE7B7',
+                            400: '#34D399',
+                            500: '#10B981',
+                            600: '#059669',
+                            700: '#047857',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom Scrollbar & Subtle Animations */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #FDF2F8;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(to bottom, #F472B6, #34D399);
+            border-radius: 9999px;
+        }
+        .gradient-bg {
+            background: radial-gradient(circle at top left, #FCE7F3 0%, #FFFFFF 45%, #D1FAE5 100%);
+        }
+        .card-hover {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgba(236, 72, 153, 0.08), 0 8px 10px -6px rgba(16, 185, 129, 0.08);
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-6px); }
+        }
+        .animate-float {
+            animation: float 4s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased selection:bg-bloomPink-200 selection:text-bloomPink-700">
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <!-- 1. HEADER & NAVIGASI -->
+    <header class="sticky top-0 z-40 bg-white/85 backdrop-blur-md border-b border-bloomPink-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16 sm:h-20">
+                <!-- Logo -->
+                <a href="#" class="flex items-center gap-2.5 group">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-bloomPink-500 to-bloomGreen-500 flex items-center justify-center text-white shadow-md shadow-bloomPink-200 group-hover:scale-105 transition-transform">
+                        <i data-lucide="graduation-cap" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <span class="font-display font-extrabold text-xl tracking-tight bg-gradient-to-r from-bloomPink-600 to-bloomGreen-600 bg-clip-text text-transparent">BloomEdu</span>
+                        <span class="block text-[10px] font-semibold uppercase tracking-wider text-slate-400 -mt-1">Beasiswa SMA & Kuliah</span>
+                    </div>
+                </a>
+
+                <!-- Desktop Navigation -->
+                <nav class="hidden md:flex items-center gap-8">
+                    <a href="#beranda" class="text-sm font-semibold text-slate-700 hover:text-bloomPink-600 transition-colors">Beranda</a>
+                    <a href="#daftar-beasiswa" class="text-sm font-semibold text-slate-700 hover:text-bloomPink-600 transition-colors">Daftar Beasiswa</a>
+                    <a href="#cek-kesiapan" class="text-sm font-semibold text-slate-700 hover:text-bloomGreen-600 transition-colors">Cek Kesiapan</a>
+                    <a href="#tips-lolos" class="text-sm font-semibold text-slate-700 hover:text-bloomGreen-600 transition-colors">Tips Lolos</a>
+                </nav>
+
+                <!-- Action Buttons -->
+                <div class="flex items-center gap-2 sm:gap-3">
+                    <!-- Bookmark Trigger -->
+                    <button onclick="openSavedModal()" class="relative inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-bloomPink-50 hover:bg-bloomPink-100 text-bloomPink-700 font-semibold text-sm transition-all border border-bloomPink-200">
+                        <i data-lucide="bookmark" class="w-4 h-4 fill-bloomPink-500 text-bloomPink-500"></i>
+                        <span class="hidden sm:inline">Tersimpan</span>
+                        <span id="saved-count-badge" class="inline-flex items-center justify-center px-2 py-0.5 text-xs font-bold rounded-full bg-bloomPink-500 text-white">0</span>
+                    </button>
+
+                    <!-- Tanya AI / Konsultasi Trigger -->
+                    <button onclick="openConsultModal()" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-bloomPink-500 to-bloomGreen-500 hover:from-bloomPink-600 hover:to-bloomGreen-600 text-white font-semibold text-sm shadow-sm shadow-bloomGreen-200 transition-all">
+                        <i data-lucide="sparkles" class="w-4 h-4"></i>
+                        <span class="hidden sm:inline">Tanya AI</span>
+                    </button>
+
+                    <!-- Mobile Menu Toggle -->
+                    <button id="mobile-menu-btn" onclick="toggleMobileMenu()" class="md:hidden p-2 rounded-xl text-slate-600 hover:bg-slate-100">
+                        <i data-lucide="menu" class="w-6 h-6"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Menu Dropdown -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-b border-bloomPink-100 px-4 pt-2 pb-4 space-y-2">
+            <a href="#beranda" onclick="toggleMobileMenu()" class="block px-3 py-2 rounded-lg text-sm font-semibold text-slate-700 hover:bg-bloomPink-50 hover:text-bloomPink-600">Beranda</a>
+            <a href="#daftar-beasiswa" onclick="toggleMobileMenu()" class="block px-3 py-2 rounded-lg text-sm font-semibold text-slate-700 hover:bg-bloomPink-50 hover:text-bloomPink-600">Daftar Beasiswa</a>
+            <a href="#cek-kesiapan" onclick="toggleMobileMenu()" class="block px-3 py-2 rounded-lg text-sm font-semibold text-slate-700 hover:bg-bloomGreen-50 hover:text-bloomGreen-600">Cek Kesiapan Dokumen</a>
+            <a href="#tips-lolos" onclick="toggleMobileMenu()" class="block px-3 py-2 rounded-lg text-sm font-semibold text-slate-700 hover:bg-bloomGreen-50 hover:text-bloomGreen-600">Tips Lolos Beasiswa</a>
+        </div>
+    </header>
+
+    <!-- 2. HERO SECTION -->
+    <section id="beranda" class="gradient-bg pt-12 pb-16 sm:pt-16 sm:pb-24 border-b border-bloomPink-100/60 overflow-hidden relative">
+        <!-- Decorative blobs -->
+        <div class="absolute top-10 left-10 w-64 h-64 bg-bloomPink-300/20 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute bottom-10 right-10 w-72 h-72 bg-bloomGreen-300/20 rounded-full blur-3xl pointer-events-none"></div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="text-center max-w-3xl mx-auto">
+                <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/90 border border-bloomPink-200 shadow-sm mb-6 animate-float">
+                    <span class="w-2 h-2 rounded-full bg-bloomGreen-500 animate-ping"></span>
+                    <span class="text-xs sm:text-sm font-semibold text-slate-700">Update Beasiswa 2026/2027 untuk Pelajar & Mahasiswa</span>
+                </div>
+
+                <h1 class="font-display font-extrabold text-3xl sm:text-5xl lg:text-6xl text-slate-900 tracking-tight leading-tight mb-5">
+                    Wujudkan Mimpi Pendidikan Tanpa Batas <span class="bg-gradient-to-r from-bloomPink-500 to-bloomGreen-500 bg-clip-text text-transparent">Biaya!</span>
+                </h1>
+
+                <p class="text-base sm:text-lg text-slate-600 mb-8 leading-relaxed">
+                    Temukan ratusan peluang beasiswa terkurasi khusus untuk siswa <strong class="text-bloomPink-600 font-semibold">SMA/SMK</strong> dan mahasiswa <strong class="text-bloomGreen-600 font-semibold">D3/D4/S1</strong> di dalam maupun luar negeri. Mulai langkahmu hari ini.
+                </p>
+
+                <!-- Quick Search Bar -->
+                <div class="bg-white p-2 rounded-2xl shadow-xl shadow-bloomPink-500/5 border border-bloomPink-100 max-w-2xl mx-auto flex flex-col sm:flex-row gap-2">
+                    <div class="relative flex-1 flex items-center">
+                        <i data-lucide="search" class="w-5 h-5 text-slate-400 ml-3.5"></i>
+                        <input type="text" id="hero-search-input" placeholder="Cari nama beasiswa, penyelenggara (cth: KIP, Djarum, Jepang)..." 
+                               class="w-full pl-3 pr-4 py-3 text-sm sm:text-base text-slate-800 placeholder-slate-400 focus:outline-none rounded-xl">
+                        <button id="clear-search-btn" onclick="clearSearch()" class="hidden mr-2 text-slate-400 hover:text-slate-600">
+                            <i data-lucide="x-circle" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                    <button onclick="scrollToScholarships()" class="px-6 py-3 rounded-xl bg-gradient-to-r from-bloomPink-500 to-bloomGreen-500 hover:from-bloomPink-600 hover:to-bloomGreen-600 text-white font-semibold text-sm sm:text-base shadow-md transition-all flex items-center justify-center gap-2">
+                        <span>Cari Beasiswa</span>
+                        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    </button>
+                </div>
+
+                <!-- Quick Popular Tags -->
+                <div class="mt-5 flex flex-wrap items-center justify-center gap-2 text-xs">
+                    <span class="text-slate-500 font-medium">Populer:</span>
+                    <button onclick="quickTagSearch('KIP Kuliah')" class="px-3 py-1 rounded-full bg-white hover:bg-bloomGreen-50 text-bloomGreen-700 border border-bloomGreen-200 font-medium transition-colors">KIP Kuliah</button>
+                    <button onclick="quickTagSearch('SMA')" class="px-3 py-1 rounded-full bg-white hover:bg-bloomPink-50 text-bloomPink-700 border border-bloomPink-200 font-medium transition-colors">Beasiswa SMA</button>
+                    <button onclick="quickTagSearch('Fully Funded')" class="px-3 py-1 rounded-full bg-white hover:bg-bloomGreen-50 text-bloomGreen-700 border border-bloomGreen-200 font-medium transition-colors">Fully Funded</button>
+                    <button onclick="quickTagSearch('Luar Negeri')" class="px-3 py-1 rounded-full bg-white hover:bg-bloomPink-50 text-bloomPink-700 border border-bloomPink-200 font-medium transition-colors">Luar Negeri</button>
+                </div>
+
+                <!-- Quick Stats -->
+                <div class="grid grid-cols-3 gap-4 max-w-xl mx-auto mt-12 pt-8 border-t border-slate-200/60">
+                    <div>
+                        <p class="font-display font-extrabold text-2xl sm:text-3xl text-bloomPink-600">10+</p>
+                        <p class="text-xs sm:text-sm text-slate-500 font-medium">Program Aktif</p>
+                    </div>
+                    <div>
+                        <p class="font-display font-extrabold text-2xl sm:text-3xl text-bloomGreen-600">100%</p>
+                        <p class="text-xs sm:text-sm text-slate-500 font-medium">Terverifikasi Resmi</p>
+                    </div>
+                    <div>
+                        <p class="font-display font-extrabold text-2xl sm:text-3xl text-slate-800">Gratis</p>
+                        <p class="text-xs sm:text-sm text-slate-500 font-medium">Akses Info & Panduan</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3 & 4. FILTER INTERAKTIF & DAFTAR BEASISWA -->
+    <section id="daftar-beasiswa" class="py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
+            <div>
+                <span class="inline-block px-3 py-1 rounded-full bg-bloomPink-100 text-bloomPink-700 text-xs font-bold uppercase tracking-wider mb-2">Eksplorasi Peluang</span>
+                <h2 class="font-display font-extrabold text-2xl sm:text-3xl text-slate-900">Daftar Beasiswa Pilihan</h2>
+                <p class="text-slate-600 text-sm sm:text-base mt-1">Filter sesuai jenjang pendidikan dan kebutuhan pendanaanmu.</p>
+            </div>
+            <div class="text-sm text-slate-500 font-medium">
+                Menampilkan <span id="result-count" class="font-bold text-slate-900">10</span> program beasiswa
+            </div>
+        </div>
+
+        <!-- Filter Controls Card -->
+        <div class="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-slate-200/80 mb-8">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <!-- Filter Jenjang -->
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Jenjang Pendidikan</label>
+                    <div class="grid grid-cols-3 gap-1.5 bg-slate-100 p-1 rounded-xl" id="filter-jenjang-group">
+                        <button onclick="setFilter('jenjang', 'Semua')" data-val="Semua" class="filter-btn-jenjang py-2 px-2 rounded-lg text-xs font-semibold bg-white text-slate-900 shadow-sm transition-all">Semua</button>
+                        <button onclick="setFilter('jenjang', 'SMA/SMK')" data-val="SMA/SMK" class="filter-btn-jenjang py-2 px-2 rounded-lg text-xs font-semibold text-slate-600 hover:text-bloomPink-600 transition-all">SMA/SMK</button>
+                        <button onclick="setFilter('jenjang', 'Kuliah')" data-val="Kuliah" class="filter-btn-jenjang py-2 px-2 rounded-lg text-xs font-semibold text-slate-600 hover:text-bloomGreen-600 transition-all">Kuliah</button>
+                    </div>
+                </div>
+
+                <!-- Filter Cakupan -->
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Cakupan Wilayah</label>
+                    <select id="filter-cakupan" onchange="setFilter('cakupan', this.value)" class="w-full py-2.5 px-3.5 rounded-xl bg-slate-50 border border-slate-200 text-sm font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-bloomPink-400">
+                        <option value="Semua">Semua Wilayah</option>
+                        <option value="Dalam Negeri">Dalam Negeri (Indonesia)</option>
+                        <option value="Luar Negeri">Luar Negeri (Internasional)</option>
+                    </select>
+                </div>
+
+                <!-- Filter Jenis Pendanaan -->
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Jenis Pendanaan</label>
+                    <select id="filter-pendanaan" onchange="setFilter('pendanaan', this.value)" class="w-full py-2.5 px-3.5 rounded-xl bg-slate-50 border border-slate-200 text-sm font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-bloomGreen-400">
+                        <option value="Semua">Semua Pendanaan</option>
+                        <option value="Fully Funded">Fully Funded (Penuh)</option>
+                        <option value="Partial">Partial / Bantuan Biaya</option>
+                    </select>
+                </div>
+
+                <!-- Urutkan -->
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Urutkan Berdasarkan</label>
+                    <select id="sort-by" onchange="setSort(this.value)" class="w-full py-2.5 px-3.5 rounded-xl bg-slate-50 border border-slate-200 text-sm font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-bloomPink-400">
+                        <option value="deadline">Deadline Terdekat</option>
+                        <option value="newest">Terbaru Ditambahkan</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Grid Kartu Beasiswa -->
+        <div id="scholarship-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Kartu akan dirender secara dinamis oleh JavaScript -->
+        </div>
+
+        <!-- Empty State saat filter tidak menemukan hasil -->
+        <div id="empty-state" class="hidden text-center py-16 bg-white rounded-3xl border border-dashed border-bloomPink-200">
+            <div class="w-16 h-16 rounded-2xl bg-bloomPink-50 text-bloomPink-500 flex items-center justify-center mx-auto mb-4">
+                <i data-lucide="search-x" class="w-8 h-8"></i>
+            </div>
+            <h3 class="font-display font-bold text-lg text-slate-800 mb-1">Beasiswa tidak ditemukan</h3>
+            <p class="text-slate-500 text-sm max-w-md mx-auto mb-5">Coba ubah kata kunci pencarian atau atur ulang filter jenjang dan pendanaanmu.</p>
+            <button onclick="resetAllFilters()" class="px-5 py-2.5 rounded-xl bg-bloomPink-500 hover:bg-bloomPink-600 text-white text-sm font-semibold transition-colors">
+                Reset Semua Filter
+            </button>
+        </div>
+    </section>
+
+    <!-- 7. KALKULATOR / CEK KESIAPAN DOKUMEN BEASISWA -->
+    <section id="cek-kesiapan" class="py-16 bg-gradient-to-br from-bloomPink-50 via-white to-bloomGreen-50 border-y border-bloomPink-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                <!-- Left Info & Score Gauge -->
+                <div class="lg:col-span-5">
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-bloomGreen-100 text-bloomGreen-700 text-xs font-bold uppercase tracking-wider mb-3">
+                        <i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i> Fitur Interaktif
+                    </span>
+                    <h2 class="font-display font-extrabold text-2xl sm:text-3xl text-slate-900 mb-3">
+                        Cek Skor Kesiapan Dokumen Beasiswamu
+                    </h2>
+                    <p class="text-slate-600 text-sm sm:text-base mb-6 leading-relaxed">
+                        Banyak pelamar gugur di tahap administrasi karena dokumen kurang lengkap. Centang berkas yang sudah kamu miliki untuk melihat persentase kesiapanmu!
+                    </p>
+
+                    <!-- Score Card -->
+                    <div class="bg-white rounded-2xl p-6 shadow-md border border-bloomGreen-100">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-sm font-bold text-slate-700">Skor Kesiapanmu</span>
+                            <span id="readiness-percentage" class="font-display font-extrabold text-2xl text-bloomGreen-600">0%</span>
+                        </div>
+                        <div class="w-full h-3.5 bg-slate-100 rounded-full overflow-hidden mb-3">
+                            <div id="readiness-bar" class="h-full bg-gradient-to-r from-bloomPink-500 to-bloomGreen-500 rounded-full transition-all duration-500" style="width: 0%"></div>
+                        </div>
+                        <p id="readiness-feedback" class="text-xs sm:text-sm font-medium text-slate-600">
+                            Mulai centang dokumen di samping untuk mengukur kesiapanmu!
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Right Interactive Checklist -->
+                <div class="lg:col-span-7">
+                    <div class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200/80">
+                        <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-100">
+                            <h3 class="font-display font-bold text-base sm:text-lg text-slate-800">Checklist Dokumen Umum (SMA & Kuliah)</h3>
+                            <button onclick="resetReadinessChecklist()" class="text-xs font-semibold text-bloomPink-600 hover:underline">Reset</button>
+                        </div>
+                        <div id="global-checklist" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <!-- Diisi via JS -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 6. PANDUAN & TIPS LOLOS BEASISWA -->
+    <section id="tips-lolos" class="py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center max-w-2xl mx-auto mb-12">
+            <span class="inline-block px-3 py-1 rounded-full bg-bloomGreen-100 text-bloomGreen-700 text-xs font-bold uppercase tracking-wider mb-2">Strategi Jitu</span>
+            <h2 class="font-display font-extrabold text-2xl sm:text-3xl text-slate-900">Panduan & Tips Lolos Seleksi</h2>
+            <p class="text-slate-600 text-sm sm:text-base mt-2">Pelajari trik menaklukkan seleksi esai, wawancara, dan administrasi dari para awardee.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+            <!-- Card Tip 1 -->
+            <div class="bg-white rounded-2xl p-6 border border-bloomPink-100 shadow-sm hover:shadow-md transition-all">
+                <div class="w-12 h-12 rounded-xl bg-bloomPink-100 text-bloomPink-600 flex items-center justify-center mb-4">
+                    <i data-lucide="pen-tool" class="w-6 h-6"></i>
+                </div>
+                <span class="text-xs font-bold text-bloomPink-600 uppercase tracking-wider">Esai & Motivation Letter</span>
+                <h3 class="font-display font-bold text-lg text-slate-900 mt-1 mb-2">Formula STAR untuk Esai Memikat</h3>
+                <p class="text-sm text-slate-600 leading-relaxed mb-4">
+                    Hindari menceritakan riwayat hidup seperti CV. Gunakan metode <strong>Situation, Task, Action, Result</strong> untuk menonjolkan dampak nyata yang pernah kamu buat di sekolah atau kampus.
+                </p>
+                <div class="p-3 rounded-xl bg-bloomPink-50/70 text-xs text-bloomPink-800 font-medium">
+                    💡 Tip: Kaitkan visi studimu dengan kontribusi nyata bagi Indonesia setelah lulus.
+                </div>
+            </div>
+
+            <!-- Card Tip 2 -->
+            <div class="bg-white rounded-2xl p-6 border border-bloomGreen-100 shadow-sm hover:shadow-md transition-all">
+                <div class="w-12 h-12 rounded-xl bg-bloomGreen-100 text-bloomGreen-600 flex items-center justify-center mb-4">
+                    <i data-lucide="mic" class="w-6 h-6"></i>
+                </div>
+                <span class="text-xs font-bold text-bloomGreen-600 uppercase tracking-wider">Seleksi Wawancara</span>
+                <h3 class="font-display font-bold text-lg text-slate-900 mt-1 mb-2">Menjawab Pertanyaan Jebakan Panelis</h3>
+                <p class="text-sm text-slate-600 leading-relaxed mb-4">
+                    Pewawancara menguji konsistensi antara esai dan kepribadianmu. Kenali kelemahan terbesarmu namun tunjukkan langkah konkret bagaimana kamu sedang memperbaikinya.
+                </p>
+                <div class="p-3 rounded-xl bg-bloomGreen-50/70 text-xs text-bloomGreen-800 font-medium">
+                    💡 Tip: Latih jawaban 1 menit untuk pertanyaan "Ceritakan tentang dirimu".
+                </div>
+            </div>
+
+            <!-- Card Tip 3 -->
+            <div class="bg-white rounded-2xl p-6 border border-bloomPink-100 shadow-sm hover:shadow-md transition-all">
+                <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-bloomPink-100 to-bloomGreen-100 text-slate-800 flex items-center justify-center mb-4">
+                    <i data-lucide="folder-check" class="w-6 h-6"></i>
+                </div>
+                <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Manajemen Waktu</span>
+                <h3 class="font-display font-bold text-lg text-slate-900 mt-1 mb-2">Aturan H-7 Sebelum Deadline</h3>
+                <p class="text-sm text-slate-600 leading-relaxed mb-4">
+                    Surat rekomendasi guru/dosen dan legalisir rapor membutuhkan waktu birokrasi. Mintalah surat rekomendasi minimal 2 minggu sebelum penutupan portal pendaftaran.
+                </p>
+                <div class="p-3 rounded-xl bg-slate-100 text-xs text-slate-700 font-medium">
+                    💡 Tip: Simpan semua dokumen dalam satu folder Google Drive dengan penamaan rapi.
+                </div>
+            </div>
+        </div>
+
+        <!-- Accordion FAQ -->
+        <div class="max-w-3xl mx-auto bg-white rounded-2xl border border-slate-200/80 divide-y divide-slate-100 shadow-sm">
+            <div class="p-5">
+                <button onclick="toggleAccordion(1)" class="w-full flex items-center justify-between text-left font-display font-bold text-slate-800 hover:text-bloomPink-600 transition-colors">
+                    <span>Apakah nilai rapor/IPK pas-pasan tetap bisa lolos beasiswa?</span>
+                    <i id="acc-icon-1" data-lucide="chevron-down" class="w-5 h-5 text-slate-400 transition-transform"></i>
+                </button>
+                <div id="acc-content-1" class="hidden mt-3 text-sm text-slate-600 leading-relaxed">
+                    Sangat bisa! Selama kamu memenuhi syarat minimum IPK/nilai rapor (misal 3.00 atau rata-rata 80), banyak beasiswa seperti <strong>Djarum Beasiswa Plus</strong> atau <strong>Beasiswa Bank Indonesia</strong> justru lebih menilai keaktifan organisasi, kepemimpinan, dan kontribusi sosial.
+                </div>
+            </div>
+            <div class="p-5">
+                <button onclick="toggleAccordion(2)" class="w-full flex items-center justify-between text-left font-display font-bold text-slate-800 hover:text-bloomGreen-600 transition-colors">
+                    <span>Bolehkah siswa SMA kelas 12 mendaftar beasiswa kuliah sebelum lulus?</span>
+                    <i id="acc-icon-2" data-lucide="chevron-down" class="w-5 h-5 text-slate-400 transition-transform"></i>
+                </button>
+                <div id="acc-content-2" class="hidden mt-3 text-sm text-slate-600 leading-relaxed">
+                    Ya! Program seperti <strong>KIP Kuliah</strong>, <strong>Beasiswa Indonesia Maju (BIM)</strong>, dan <strong>Beasiswa Mitsui Bussan</strong> memang ditujukan khusus bagi siswa kelas 12 SMA/SMK sederajat yang akan melanjutkan studi ke perguruan tinggi menggunakan nilai rapor semester 1–5.
+                </div>
+            </div>
+            <div class="p-5">
+                <button onclick="toggleAccordion(3)" class="w-full flex items-center justify-between text-left font-display font-bold text-slate-800 hover:text-bloomPink-600 transition-colors">
+                    <span>Apakah penerima KIP Kuliah boleh mendaftar beasiswa lain?</span>
+                    <i id="acc-icon-3" data-lucide="chevron-down" class="w-5 h-5 text-slate-400 transition-transform"></i>
+                </button>
+                <div id="acc-content-3" class="hidden mt-3 text-sm text-slate-600 leading-relaxed">
+                    Umumnya tidak diperbolehkan menerima dua sumber pendanaan biaya pendidikan dari APBN secara bersamaan (double funding). Namun, beberapa beasiswa non-pemerintah yang berfokus pada pengembangan soft-skill (tanpa komponen UKT) terkadang memperbolehkan sesuai syarat penyelenggara.
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 8. FOOTER -->
+    <footer class="bg-slate-900 text-slate-300 pt-16 pb-10 border-t-4 border-gradient-to-r from-bloomPink-500 to-bloomGreen-500">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 pb-12 border-b border-slate-800">
+                <!-- Brand -->
+                <div class="lg:col-span-1">
+                    <div class="flex items-center gap-2.5 mb-4">
+                        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-bloomPink-500 to-bloomGreen-500 flex items-center justify-center text-white">
+                            <i data-lucide="graduation-cap" class="w-5 h-5"></i>
+                        </div>
+                        <span class="font-display font-extrabold text-xl text-white">BloomEdu</span>
+                    </div>
+                    <p class="text-sm text-slate-400 leading-relaxed mb-4">
+                        Portal informasi beasiswa terpercaya untuk membantu pelajar SMA/SMK dan mahasiswa Indonesia meraih pendidikan tinggi impian.
+                    </p>
+                    <div class="flex items-center gap-3">
+                        <a href="#beranda" class="w-9 h-9 rounded-lg bg-slate-800 hover:bg-bloomPink-500 text-white flex items-center justify-center transition-colors"><i data-lucide="instagram" class="w-4 h-4"></i></a>
+                        <a href="#beranda" class="w-9 h-9 rounded-lg bg-slate-800 hover:bg-bloomGreen-500 text-white flex items-center justify-center transition-colors"><i data-lucide="globe" class="w-4 h-4"></i></a>
+                        <a href="#beranda" class="w-9 h-9 rounded-lg bg-slate-800 hover:bg-bloomPink-500 text-white flex items-center justify-center transition-colors"><i data-lucide="mail" class="w-4 h-4"></i></a>
+                    </div>
+                </div>
+
+                <!-- Navigasi Cepat -->
+                <div>
+                    <h4 class="font-display font-bold text-white text-sm uppercase tracking-wider mb-4">Kategori Populer</h4>
+                    <ul class="space-y-2.5 text-sm">
+                        <li><button onclick="quickTagSearch('SMA/SMK')" class="hover:text-bloomPink-400 transition-colors">Beasiswa Siswa SMA/SMK</button></li>
+                        <li><button onclick="quickTagSearch('Kuliah')" class="hover:text-bloomGreen-400 transition-colors">Beasiswa Mahasiswa S1/D4/D3</button></li>
+                        <li><button onclick="quickTagSearch('Fully Funded')" class="hover:text-bloomPink-400 transition-colors">Beasiswa Fully Funded</button></li>
+                        <li><button onclick="quickTagSearch('Luar Negeri')" class="hover:text-bloomGreen-400 transition-colors">Beasiswa Luar Negeri</button></li>
+                    </ul>
+                </div>
+
+                <!-- Bantuan -->
+                <div>
+                    <h4 class="font-display font-bold text-white text-sm uppercase tracking-wider mb-4">Sumber Daya</h4>
+                    <ul class="space-y-2.5 text-sm">
+                        <li><a href="#cek-kesiapan" class="hover:text-bloomGreen-400 transition-colors">Cek Kesiapan Dokumen</a></li>
+                        <li><a href="#tips-lolos" class="hover:text-bloomPink-400 transition-colors">Panduan Motivation Letter</a></li>
+                        <li><button onclick="openConsultModal()" class="hover:text-bloomGreen-400 transition-colors">Konsultasi AI Beasiswa</button></li>
+                        <li><button onclick="openSavedModal()" class="hover:text-bloomPink-400 transition-colors">Beasiswa Tersimpan</button></li>
+                    </ul>
+                </div>
+
+                <!-- Newsletter -->
+                <div>
+                    <h4 class="font-display font-bold text-white text-sm uppercase tracking-wider mb-4">Notifikasi Beasiswa Baru</h4>
+                    <p class="text-sm text-slate-400 mb-3">Dapatkan info pembukaan beasiswa langsung ke emailmu setiap minggu.</p>
+                    <form onsubmit="handleNewsletter(event)" class="space-y-2">
+                        <input type="email" id="newsletter-email" required placeholder="Masukkan email aktif..." class="w-full px-3.5 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-bloomPink-500">
+                        <button type="submit" class="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-bloomPink-500 to-bloomGreen-500 hover:from-bloomPink-600 hover:to-bloomGreen-600 text-white font-semibold text-sm transition-all">
+                            Berlangganan Gratis
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="pt-8 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-4">
+                <p>&copy; 2026 BloomEdu Indonesia. Dibuat untuk masa depan pendidikan Indonesia.</p>
+                <p>Selalu verifikasi tanggal resmi pada laman penyelenggara masing-masing.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 5. MODAL DETAIL BEASISWA -->
+    <div id="detail-modal" class="fixed inset-0 z-50 hidden overflow-y-auto bg-slate-900/60 backdrop-blur-sm p-4 sm:p-6 flex items-center justify-center">
+        <div class="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-bloomPink-100 relative animate-[fadeIn_0.2s_ease-out]">
+            <!-- Modal Header Banner -->
+            <div id="modal-banner" class="p-6 sm:p-8 bg-gradient-to-r from-bloomPink-50 to-bloomGreen-50 border-b border-slate-100 relative">
+                <button onclick="closeDetailModal()" class="absolute top-5 right-5 w-9 h-9 rounded-full bg-white/90 hover:bg-white text-slate-600 hover:text-bloomPink-600 flex items-center justify-center shadow-sm transition-colors">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+                <div id="modal-badges" class="flex flex-wrap gap-2 mb-3"></div>
+                <h3 id="modal-title" class="font-display font-extrabold text-2xl sm:text-3xl text-slate-900 mb-1">Nama Beasiswa</h3>
+                <p id="modal-provider" class="text-sm font-semibold text-slate-600 flex items-center gap-1.5">
+                    <i data-lucide="building-2" class="w-4 h-4 text-bloomGreen-600"></i>
+                    <span>Penyelenggara</span>
+                </p>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="p-6 sm:p-8 space-y-6">
+                <!-- Info Grid -->
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                    <div>
+                        <span class="block text-[11px] font-bold uppercase text-slate-400">Deadline</span>
+                        <span id="modal-deadline" class="text-sm font-bold text-bloomPink-600">-</span>
+                    </div>
+                    <div>
+                        <span class="block text-[11px] font-bold uppercase text-slate-400">Cakupan</span>
+                        <span id="modal-scope" class="text-sm font-bold text-slate-800">-</span>
+                    </div>
+                    <div class="col-span-2 sm:col-span-1">
+                        <span class="block text-[11px] font-bold uppercase text-slate-400">Pendanaan</span>
+                        <span id="modal-funding" class="text-sm font-bold text-bloomGreen-600">-</span>
+                    </div>
+                </div>
+
+                <!-- Deskripsi -->
+                <div>
+                    <h4 class="font-display font-bold text-base text-slate-900 mb-2">Tentang Program</h4>
+                    <p id="modal-desc" class="text-sm text-slate-600 leading-relaxed"></p>
+                </div>
+
+                <!-- Benefit -->
+                <div>
+                    <h4 class="font-display font-bold text-base text-slate-900 mb-2.5 flex items-center gap-2">
+                        <i data-lucide="gift" class="w-4 h-4 text-bloomGreen-500"></i> Cakupan & Benefit Beasiswa
+                    </h4>
+                    <ul id="modal-benefits" class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-slate-700"></ul>
+                </div>
+
+                <!-- Syarat Pendaftaran (Checklist Interaktif per Beasiswa) -->
+                <div class="bg-bloomPink-50/40 rounded-2xl p-5 border border-bloomPink-100">
+                    <div class="flex items-center justify-between mb-3">
+                        <h4 class="font-display font-bold text-base text-slate-900 flex items-center gap-2">
+                            <i data-lucide="check-square" class="w-4 h-4 text-bloomPink-500"></i> Syarat & Checklist Dokumen
+                        </h4>
+                        <span id="modal-req-progress" class="text-xs font-bold px-2.5 py-1 rounded-full bg-white text-bloomPink-600 border border-bloomPink-200">0/0 Siap</span>
+                    </div>
+                    <p class="text-xs text-slate-500 mb-3">Centang dokumen di bawah ini untuk melacak kesiapanmu mendaftar beasiswa ini:</p>
+                    <div id="modal-requirements" class="space-y-2"></div>
+                </div>
+
+                <!-- Timeline Seleksi -->
+                <div>
+                    <h4 class="font-display font-bold text-base text-slate-900 mb-3 flex items-center gap-2">
+                        <i data-lucide="calendar" class="w-4 h-4 text-bloomGreen-500"></i> Linimasa Seleksi
+                    </h4>
+                    <div id="modal-timeline" class="space-y-2.5 border-l-2 border-bloomGreen-200 ml-2 pl-4"></div>
+                </div>
+            </div>
+
+            <!-- Modal Footer Actions -->
+            <div class="p-6 bg-slate-50 border-t border-slate-100 flex flex-col sm:flex-row gap-3 justify-end">
+                <button id="modal-save-btn" class="px-5 py-3 rounded-xl border border-bloomPink-200 bg-white hover:bg-bloomPink-50 text-bloomPink-700 font-semibold text-sm flex items-center justify-center gap-2 transition-colors">
+                    <i data-lucide="bookmark" class="w-4 h-4"></i>
+                    <span>Simpan Beasiswa</span>
+                </button>
+                <a id="modal-apply-link" href="#" target="_blank" rel="noopener noreferrer" class="px-6 py-3 rounded-xl bg-gradient-to-r from-bloomPink-500 to-bloomGreen-500 hover:from-bloomPink-600 hover:to-bloomGreen-600 text-white font-semibold text-sm flex items-center justify-center gap-2 shadow-md transition-all">
+                    <span>Daftar di Situs Resmi</span>
+                    <i data-lucide="external-link" class="w-4 h-4"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL BEASISWA TERSIMPAN (BOOKMARK) -->
+    <div id="saved-modal" class="fixed inset-0 z-50 hidden overflow-y-auto bg-slate-900/60 backdrop-blur-sm p-4 flex items-center justify-center">
+        <div class="bg-white rounded-3xl max-w-lg w-full max-h-[85vh] overflow-y-auto shadow-2xl border border-bloomPink-100 p-6">
+            <div class="flex items-center justify-between pb-4 border-b border-slate-100 mb-4">
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-lg bg-bloomPink-100 text-bloomPink-600 flex items-center justify-center">
+                        <i data-lucide="bookmark" class="w-4 h-4 fill-bloomPink-500"></i>
+                    </div>
+                    <h3 class="font-display font-bold text-lg text-slate-900">Beasiswa Tersimpan</h3>
+                </div>
+                <button onclick="closeSavedModal()" class="p-1.5 rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-700">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div id="saved-list-container" class="space-y-3">
+                <!-- Diisi via JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL TANYA AI / REKOMENDASI CEPAT -->
+    <div id="consult-modal" class="fixed inset-0 z-50 hidden overflow-y-auto bg-slate-900/60 backdrop-blur-sm p-4 flex items-center justify-center">
+        <div class="bg-white rounded-3xl max-w-lg w-full shadow-2xl border border-bloomGreen-100 overflow-hidden">
+            <div class="p-5 bg-gradient-to-r from-bloomPink-500 to-bloomGreen-500 text-white flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                    <i data-lucide="sparkles" class="w-5 h-5"></i>
+                    <div>
+                        <h3 class="font-display font-bold text-base">Asisten Rekomendasi Beasiswa</h3>
+                        <p class="text-xs text-white/85">Temukan beasiswa paling cocok dalam 10 detik</p>
+                    </div>
+                </div>
+                <button onclick="closeConsultModal()" class="p-1 rounded-lg hover:bg-white/20 transition-colors">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div class="p-6 space-y-4">
+                <div>
+                    <label class="block text-xs font-bold uppercase text-slate-500 mb-1.5">1. Status Pendidikanmu Saat Ini?</label>
+                    <select id="ai-level" class="w-full p-3 rounded-xl border border-slate-200 text-sm font-medium focus:outline-none focus:border-bloomPink-500">
+                        <option value="SMA/SMK">Siswa SMA / SMK / MA Sederajat</option>
+                        <option value="Kuliah">Mahasiswa Aktif (D3 / D4 / S1)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase text-slate-500 mb-1.5">2. Fokus Utama yang Kamu Cari?</label>
+                    <select id="ai-goal" class="w-full p-3 rounded-xl border border-slate-200 text-sm font-medium focus:outline-none focus:border-bloomGreen-500">
+                        <option value="all">Bantuan Biaya Kuliah / Sekolah Penuh</option>
+                        <option value="abroad">Pengalaman Pertukaran / Kuliah ke Luar Negeri</option>
+                        <option value="leadership">Pengembangan Kepemimpinan & Soft Skill</option>
+                    </select>
+                </div>
+                <button onclick="generateAIRecommendation()" class="w-full py-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-semibold text-sm transition-colors">
+                    Tampilkan Rekomendasi Terbaik
+                </button>
+                <div id="ai-result-box" class="hidden pt-3 border-t border-slate-100 space-y-2">
+                    <p class="text-xs font-bold uppercase text-bloomGreen-600">Rekomendasi Untukmu:</p>
+                    <div id="ai-result-list" class="space-y-2"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // 1. DATA BEASISWA REALISTIS INDONESIA (10 PROGRAM)
+        const scholarshipsData = [
+            {
+                id: "bim-sma",
+                title: "Beasiswa Indonesia Maju (BIM) - Persiapan S1",
+                provider: "Puspresnas - Kemendikbudristek",
+                level: "SMA/SMK",
+                scope: "Luar Negeri",
+                funding: "Fully Funded",
+                deadline: "2026-12-15",
+                deadlineText: "15 Des 2026",
+                status: "Masih Buka",
+                categoryTag: "abroad",
+                summary: "Program pembinaan dan beasiswa penuh S1 luar negeri bagi siswa kelas 11 SMA/SMK/MA berprestasi di ajang talenta nasional/internasional.",
+                benefits: [
+                    "Biaya persiapan tes SAT/ACT & IELTS/TOEFL",
+                    "Biaya pendaftaran universitas luar negeri",
+                    "Biaya kuliah (Tuition Fee) penuh hingga lulus",
+                    "Tunjangan hidup bulanan & tiket pesawat PP"
+                ],
+                requirements: [
+                    "Siswa aktif kelas XI SMA/SMK/MA sederajat",
+                    "Memiliki sertifikat prestasi/lomba tingkat nasional atau internasional",
+                    "Nilai rapor semester 1-3 rata-rata minimal 85",
+                    "Esai rencana studi dan kontribusi pasca-studi",
+                    "Surat izin orang tua & rekomendasi kepala sekolah"
+                ],
+                timeline: [
+                    { step: "Pendaftaran & Unggah Berkas", date: "November – 15 Desember 2026" },
+                    { step: "Seleksi Substansi & Esai", date: "Januari 2027" },
+                    { step: "Wawancara & Pembinaan Intensif", date: "Februari 2027" }
+                ],
+                url: "https://pusatprestasinasional.kemdikbud.go.id"
+            },
+            {
+                id: "kip-kuliah",
+                title: "KIP Kuliah Merdeka 2026/2027",
+                provider: "Kemendikbudristek RI",
+                level: "SMA/SMK",
+                scope: "Dalam Negeri",
+                funding: "Fully Funded",
+                deadline: "2026-12-10",
+                deadlineText: "10 Des 2026",
+                status: "Segera Tutup",
+                categoryTag: "all",
+                summary: "Bantuan biaya pendidikan penuh dan biaya hidup bulanan bagi lulusan SMA/SMK sederajat dari keluarga kurang mampu secara ekonomi.",
+                benefits: [
+                    "Pembebasan penuh biaya pendaftaran seleksi masuk PTN/PTS",
+                    "Pembebasan biaya kuliah/UKT 100% dibayarkan ke kampus",
+                    "Bantuan biaya hidup bulanan (Rp800rb - Rp1,4jt sesuai klaster wilayah)"
+                ],
+                requirements: [
+                    "Siswa SMA/SMK/MA lulusan tahun berjalan atau maksimal 2 tahun sebelumnya",
+                    "Memiliki NISN, NPSN, dan NIK yang valid",
+                    "Terdaftar di DTKS Kemensos atau memiliki SKTM/bukti pendapatan orang tua",
+                    "Lulus seleksi masuk perguruan tinggi pada prodi terakreditasi"
+                ],
+                timeline: [
+                    { step: "Pembuatan Akun Siswa KIP Kuliah", date: "Hingga 10 Desember 2026" },
+                    { step: "Sinkronisasi Jalur Seleksi PTN/PTS", date: "Januari – Maret 2027" },
+                    { step: "Verifikasi Berkas & Penetapan", date: "April 2027" }
+                ],
+                url: "https://kip-kuliah.kemdikbud.go.id"
+            },
+            {
+                id: "djarum-plus",
+                title: "Djarum Beasiswa Plus",
+                provider: "Djarum Foundation",
+                level: "Kuliah",
+                scope: "Dalam Negeri",
+                funding: "Partial",
+                deadline: "2027-01-20",
+                deadlineText: "20 Jan 2027",
+                status: "Masih Buka",
+                categoryTag: "leadership",
+                summary: "Beasiswa prestasi bagi mahasiswa S1/D4 semester 4 yang dilengkapi pelatihan soft skills kepemimpinan tingkat nasional.",
+                benefits: [
+                    "Dana beasiswa sebesar Rp1.000.000/bulan selama 1 tahun",
+                    "Pelatihan Character Building & Leadership Development",
+                    "Nation Building & Community Empowerment",
+                    "Jejaring Beswan Djarum seluruh Indonesia"
+                ],
+                requirements: [
+                    "Mahasiswa aktif S1/D4 semester 4 dari PTN/PTS mitra",
+                    "IPK minimum 3.00 pada semester 3",
+                    "Aktif mengikuti kegiatan organisasi di dalam maupun luar kampus",
+                    "Tidak sedang menerima beasiswa dari pihak lain",
+                    "Surat keterangan aktif kuliah dari kampus"
+                ],
+                timeline: [
+                    { step: "Pendaftaran Online", date: "Desember 2026 – 20 Januari 2027" },
+                    { step: "Seleksi Administrasi & Tes Tulis Online", date: "Februari 2027" },
+                    { step: "Wawancara & Pengumuman Beswan", date: "Maret 2027" }
+                ],
+                url: "https://djarumbeasiswaplus.org"
+            },
+            {
+                id: "mitsui-bussan",
+                title: "Beasiswa Mitsui-Bussan Jepang (S1)",
+                provider: "Mitsui & Co., Ltd.",
+                level: "SMA/SMK",
+                scope: "Luar Negeri",
+                funding: "Fully Funded",
+                deadline: "2027-02-05",
+                deadlineText: "05 Feb 2027",
+                status: "Masih Buka",
+                categoryTag: "abroad",
+                summary: "Beasiswa penuh untuk siswa SMA jurusan IPA/IPS yang ingin menempuh pendidikan S1 di universitas terkemuka di Jepang.",
+                benefits: [
+                    "Tunjangan hidup 145.000 Yen per bulan",
+                    "Tiket pesawat PP Indonesia - Jepang",
+                    "Kursus bahasa Jepang intensif selama 1,5 tahun",
+                    "Biaya kuliah penuh & asuransi kesehatan selama di Jepang"
+                ],
+                requirements: [
+                    "WNI berusia di bawah 20 tahun",
+                    "Siswa kelas 12 SMA/MA jurusan IPA atau IPS",
+                    "Nilai rata-rata rapor semester 3 dan 4 minimal 85 pada mata pelajaran utama",
+                    "Bersedia belajar bahasa Jepang dan tinggal di Jepang"
+                ],
+                timeline: [
+                    { step: "Registrasi Online & Kirim Dokumen", date: "Januari – 5 Februari 2027" },
+                    { step: "Ujian Tertulis (Matematika & B. Inggris)", date: "Maret 2027" },
+                    { step: "Tes Kesehatan & Wawancara", date: "April 2027" }
+                ],
+                url: "https://www.mbkscholarship-id.com"
+            },
+            {
+                id: "beasiswa-unggulan",
+                title: "Beasiswa Unggulan Masyarakat Berprestasi",
+                provider: "Kemendikbudristek RI",
+                level: "Kuliah",
+                scope: "Dalam Negeri",
+                funding: "Fully Funded",
+                deadline: "2026-12-28",
+                deadlineText: "28 Des 2026",
+                status: "Masih Buka",
+                categoryTag: "all",
+                summary: "Dukungan pendanaan penuh bagi mahasiswa baru maupun on-going (maksimal semester 3) dengan prestasi akademik/non-akademik.",
+                benefits: [
+                    "Biaya pendidikan (UKT/SPP) penuh hingga semester 8",
+                    "Tunjangan biaya hidup bulanan",
+                    "Tunjangan biaya buku setiap semester"
+                ],
+                requirements: [
+                    "Mahasiswa baru (memiliki LoA Unconditional) atau on-going maks. semester 3",
+                    "IPK minimal 3.25 bagi mahasiswa on-going",
+                    "Sertifikat UKBI (Uji Kemahiran Berbahasa Indonesia)",
+                    "Esai karya tulis bertema kontribusi untuk Indonesia",
+                    "Sertifikat prestasi tingkat kabupaten/provinsi/nasional"
+                ],
+                timeline: [
+                    { step: "Pendaftaran & Unggah Dokumen", date: "Hingga 28 Desember 2026" },
+                    { step: "Seleksi Administrasi", date: "Januari 2027" },
+                    { step: "Seleksi Wawancara Daring", date: "Februari 2027" }
+                ],
+                url: "https://beasiswaunggulan.kemdikbud.go.id"
+            },
+            {
+                id: "afs-yes-sma",
+                title: "Pertukaran Pelajar KL-YES & AFS",
+                provider: "Bina Antarbudaya",
+                level: "SMA/SMK",
+                scope: "Luar Negeri",
+                funding: "Fully Funded",
+                deadline: "2027-01-15",
+                deadlineText: "15 Jan 2027",
+                status: "Masih Buka",
+                categoryTag: "abroad",
+                summary: "Program pertukaran pelajar SMA selama 1 tahun akademik di Amerika Serikat (KL-YES) atau negara mitra Eropa/Asia.",
+                benefits: [
+                    "Biaya perjalanan internasional & visa ditanggung penuh",
+                    "Tinggal bersama keluarga angkat (Host Family) terseleksi",
+                    "Bersekolah di SMA lokal luar negeri selama 1 tahun",
+                    "Uang saku bulanan & asuransi kesehatan"
+                ],
+                requirements: [
+                    "Siswa kelas 10 atau 11 SMA/SMK/MA",
+                    "Nilai rapor rata-rata minimal 80 untuk semua mata pelajaran",
+                    "Aktif berorganisasi dan memiliki jiwa kepemimpinan",
+                    "Mendapat persetujuan orang tua dan sekolah asal"
+                ],
+                timeline: [
+                    { step: "Pendaftaran & Seleksi Berkas Chapter", date: "Hingga 15 Januari 2027" },
+                    { step: "Seleksi Wawancara & Dinamika Kelompok", date: "Februari 2027" },
+                    { step: "Seleksi Nasional & Orientasi", date: "April 2027" }
+                ],
+                url: "https://bina-antarbudaya.or.id"
+            },
+            {
+                id: "bank-indonesia",
+                title: "Beasiswa Bank Indonesia (GenBI)",
+                provider: "Bank Indonesia",
+                level: "Kuliah",
+                scope: "Dalam Negeri",
+                funding: "Partial",
+                deadline: "2027-02-18",
+                deadlineText: "18 Feb 2027",
+                status: "Masih Buka",
+                categoryTag: "leadership",
+                summary: "Beasiswa bagi mahasiswa S1/D4 PTN/PTS mitra disertai bergabung dalam komunitas Generasi Baru Indonesia (GenBI).",
+                benefits: [
+                    "Tunjangan dana pendidikan Rp1.000.000 - Rp1.500.000/bulan",
+                    "Menjadi anggota komunitas GenBI & pelatihan kebanksentralan",
+                    "Kesempatan mengikuti Leadership Camp Nasional"
+                ],
+                requirements: [
+                    "Mahasiswa aktif S1/D4 minimal semester 3",
+                    "IPK minimal 3.00 (skala 4.00)",
+                    "Membuat motivation letter dan resume pribadi",
+                    "Surat rekomendasi dari 1 tokoh (akademik/non-akademik)",
+                    "Aktif dalam kegiatan sosial kemasyarakatan"
+                ],
+                timeline: [
+                    { step: "Seleksi Berkas di Kampus Mitra", date: "Januari – 18 Februari 2027" },
+                    { step: "Wawancara oleh Tim Bank Indonesia", date: "Maret 2027" },
+                    { step: "Pengumuman Penerima Beasiswa", date: "April 2027" }
+                ],
+                url: "https://www.bi.go.id"
+            },
+            {
+                id: "bca-finance",
+                title: "Beasiswa BCA Finance Peduli",
+                provider: "PT BCA Finance",
+                level: "Kuliah",
+                scope: "Dalam Negeri",
+                funding: "Partial",
+                deadline: "2026-12-05",
+                deadlineText: "05 Des 2026",
+                status: "Segera Tutup",
+                categoryTag: "all",
+                summary: "Bantuan dana pendidikan bagi mahasiswa S1/D4 yang sedang menempuh semester 4 hingga semester 8.",
+                benefits: [
+                    "Bantuan dana pendidikan sebesar Rp3.500.000 per semester",
+                    "Pelatihan kesiapan kerja & literasi keuangan",
+                    "Tidak ada ikatan dinas"
+                ],
+                requirements: [
+                    "Mahasiswa aktif S1/D4 minimal semester 4 dan maksimal semester 8",
+                    "IPK minimal 3.20 (PTN) atau 3.40 (PTS)",
+                    "Tidak sedang menerima beasiswa lain",
+                    "Bebas dari keterlibatan narkoba dan tindak kriminal"
+                ],
+                timeline: [
+                    { step: "Pendaftaran Online Tahap 1", date: "Hingga 5 Desember 2026" },
+                    { step: "Tes Psikotes Online", date: "15 Desember 2026" },
+                    { step: "Pengumuman Final", date: "Januari 2027" }
+                ],
+                url: "https://bcafinance.co.id"
+            },
+            {
+                id: "sejuta-cita-sma",
+                title: "Beasiswa Pelajar Berprestasi & Kurang Mampu",
+                provider: "Yayasan Pendidikan Nusantara",
+                level: "SMA/SMK",
+                scope: "Dalam Negeri",
+                funding: "Partial",
+                deadline: "2027-01-30",
+                deadlineText: "30 Jan 2027",
+                status: "Masih Buka",
+                categoryTag: "all",
+                summary: "Dukungan dana penunjang sekolah, pembelian buku, dan kuota belajar bagi siswa aktif kelas 10, 11, dan 12 SMA/SMK.",
+                benefits: [
+                    "Dana bantuan pendidikan Rp750.000/semester",
+                    "Akses gratis kelas persiapan UTBK-SNBT",
+                    "Sertifikat nasional penerima beasiswa"
+                ],
+                requirements: [
+                    "Siswa aktif kelas X, XI, atau XII SMA/SMK/MA",
+                    "Melampirkan scan kartu pelajar dan rapor terakhir",
+                    "Mengisi formulir esai singkat tentang cita-cita",
+                    "Diperbolehkan bagi penerima PIP/KIP Sekolah"
+                ],
+                timeline: [
+                    { step: "Pengisian Formulir Online", date: "Desember 2026 – 30 Januari 2027" },
+                    { step: "Verifikasi Data Sekolah", date: "Februari 2027" },
+                    { step: "Pencairan Dana Tahap 1", date: "Maret 2027" }
+                ],
+                url: "https://kemdikbud.go.id"
+            },
+            {
+                id: "gks-korea",
+                title: "Global Korea Scholarship (GKS-U) S1",
+                provider: "NIIED - Pemerintah Korea Selatan",
+                level: "SMA/SMK",
+                scope: "Luar Negeri",
+                funding: "Fully Funded",
+                deadline: "2027-02-25",
+                deadlineText: "25 Feb 2027",
+                status: "Masih Buka",
+                categoryTag: "abroad",
+                summary: "Beasiswa bergengsi dari pemerintah Korea Selatan bagi lulusan SMA/SMK Indonesia untuk kuliah S1 di universitas top Korea.",
+                benefits: [
+                    "Tiket pesawat PP Indonesia - Korea Selatan",
+                    "Biaya kuliah penuh 4 tahun + 1 tahun kelas bahasa Korea",
+                    "Tunjangan hidup 900.000 KRW per bulan",
+                    "Tunjangan kedatangan & asuransi kesehatan penuh"
+                ],
+                requirements: [
+                    "Lulusan SMA/SMK/MA atau siswa kelas 12 yang akan lulus",
+                    "Nilai rata-rata ijazah/rapor minimal 80%",
+                    "Personal Statement & Study Plan dalam Bahasa Inggris/Korea",
+                    "2 Surat Rekomendasi dari guru atau kepala sekolah"
+                ],
+                timeline: [
+                    { step: "Pengumpulan Dokumen Jalur Kedutaan/Universitas", date: "Januari – 25 Februari 2027" },
+                    { step: "Seleksi Wawancara", date: "Maret 2027" },
+                    { step: "Pengumuman Final NIIED", date: "Mei 2027" }
+                ],
+                url: "https://www.studyinkorea.go.kr"
+            }
+        ];
+
+        // Global Document Readiness Checklist Items
+        const globalChecklistItems = [
+            { id: "doc-ktp", label: "KTP / Kartu Pelajar / KK Terbaru" },
+            { id: "doc-rapor", label: "Scan Rapor / Transkrip Nilai Terlegalisir" },
+            { id: "doc-cv", label: "CV Kreatif / ATS-Friendly Terbaru" },
+            { id: "doc-essay", label: "Draft Motivation Letter / Esai Diri" },
+            { id: "doc-rekom", label: "Surat Rekomendasi Guru / Dosen" },
+            { id: "doc-sertif", label: "Portofolio / Sertifikat Prestasi & Organisasi" },
+            { id: "doc-foto", label: "Pas Foto Formal Latar Merah/Biru" },
+            { id: "doc-aktif", label: "Surat Keterangan Aktif Sekolah / Kuliah" }
+        ];
+
+        // STATE MANAGEMENT
+        let state = {
+            jenjang: 'Semua',
+            cakupan: 'Semua',
+            pendanaan: 'Semua',
+            search: '',
+            sort: 'deadline',
+            savedIds: JSON.parse(localStorage.getItem('bloomedu_saved_scholarships')) || [],
+            reqProgress: JSON.parse(localStorage.getItem('bloomedu_req_progress')) || {},
+            globalDocs: JSON.parse(localStorage.getItem('bloomedu_global_docs')) || []
+        };
+
+        // INITIALIZATION
+        document.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+            updateSavedBadge();
+            renderScholarships();
+            renderGlobalChecklist();
+
+            // Search input listener
+            const searchInput = document.getElementById('hero-search-input');
+            const clearBtn = document.getElementById('clear-search-btn');
+            searchInput.addEventListener('input', (e) => {
+                state.search = e.target.value.trim();
+                clearBtn.classList.toggle('hidden', state.search === '');
+                renderScholarships();
+            });
+        });
+
+        // TOAST NOTIFICATION HELPER
+        function showToast(message, type = 'pink') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            const bgClass = type === 'green' 
+                ? 'bg-bloomGreen-600 text-white' 
+                : 'bg-bloomPink-600 text-white';
+            
+            toast.className = `${bgClass} px-4 py-3 rounded-xl shadow-lg text-sm font-semibold flex items-center gap-2 pointer-events-auto transform transition-all duration-300 translate-y-2 opacity-0`;
+            toast.innerHTML = `<i data-lucide="check-circle" class="w-4 h-4"></i><span>${message}</span>`;
+            
+            container.appendChild(toast);
+            lucide.createIcons();
+
+            requestAnimationFrame(() => {
+                toast.classList.remove('translate-y-2', 'opacity-0');
+            });
+
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-2');
+                setTimeout(() => toast.remove(), 300);
+            }, 2600);
+        }
+
+        // NAVIGATION & SEARCH HELPERS
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        }
+
+        function scrollToScholarships() {
+            document.getElementById('daftar-beasiswa').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function clearSearch() {
+            const input = document.getElementById('hero-search-input');
+            input.value = '';
+            state.search = '';
+            document.getElementById('clear-search-btn').classList.add('hidden');
+            renderScholarships();
+        }
+
+        function quickTagSearch(tag) {
+            if (tag === 'SMA' || tag === 'SMA/SMK') {
+                setFilter('jenjang', 'SMA/SMK');
+            } else if (tag === 'Kuliah') {
+                setFilter('jenjang', 'Kuliah');
+            } else if (tag === 'Fully Funded') {
+                document.getElementById('filter-pendanaan').value = 'Fully Funded';
+                setFilter('pendanaan', 'Fully Funded');
+            } else if (tag === 'Luar Negeri') {
+                document.getElementById('filter-cakupan').value = 'Luar Negeri';
+                setFilter('cakupan', 'Luar Negeri');
+            } else {
+                const input = document.getElementById('hero-search-input');
+                input.value = tag;
+                state.search = tag;
+                document.getElementById('clear-search-btn').classList.remove('hidden');
+                renderScholarships();
+            }
+            scrollToScholarships();
+        }
+
+        // FILTER & SORT FUNCTIONS
+        function setFilter(key, value) {
+            state[key] = value;
+
+            if (key === 'jenjang') {
+                document.querySelectorAll('.filter-btn-jenjang').forEach(btn => {
+                    const isMatch = btn.dataset.val === value;
+                    if (isMatch) {
+                        btn.className = 'filter-btn-jenjang py-2 px-2 rounded-lg text-xs font-bold bg-gradient-to-r from-bloomPink-500 to-bloomGreen-500 text-white shadow-sm transition-all';
+                    } else {
+                        btn.className = 'filter-btn-jenjang py-2 px-2 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 transition-all';
+                    }
+                });
+            }
+            renderScholarships();
+        }
+
+        function setSort(value) {
+            state.sort = value;
+            renderScholarships();
+        }
+
+        function resetAllFilters() {
+            state.jenjang = 'Semua';
+            state.cakupan = 'Semua';
+            state.pendanaan = 'Semua';
+            state.search = '';
+            document.getElementById('hero-search-input').value = '';
+            document.getElementById('clear-search-btn').classList.add('hidden');
+            document.getElementById('filter-cakupan').value = 'Semua';
+            document.getElementById('filter-pendanaan').value = 'Semua';
+            setFilter('jenjang', 'Semua');
+        }
+
+        // RENDER SCHOLARSHIP CARDS
+        function renderScholarships() {
+            const grid = document.getElementById('scholarship-grid');
+            const emptyState = document.getElementById('empty-state');
+            const resultCount = document.getElementById('result-count');
+
+            let filtered = scholarshipsData.filter(item => {
+                const matchJenjang = state.jenjang === 'Semua' || item.level === state.jenjang;
+                const matchCakupan = state.cakupan === 'Semua' || item.scope === state.cakupan;
+                const matchPendanaan = state.pendanaan === 'Semua' || item.funding === state.pendanaan;
+                const query = state.search.toLowerCase();
+                const matchSearch = !query || 
+                    item.title.toLowerCase().includes(query) ||
+                    item.provider.toLowerCase().includes(query) ||
+                    item.summary.toLowerCase().includes(query) ||
+                    item.scope.toLowerCase().includes(query) ||
+                    item.level.toLowerCase().includes(query);
+
+                return matchJenjang && matchCakupan && matchPendanaan && matchSearch;
+            });
+
+            // Sorting
+            if (state.sort === 'deadline') {
+                filtered.sort((a, b) => new Date(a.deadline) - new Date(b.deadline));
+            } else {
+                filtered.reverse();
+            }
+
+            resultCount.textContent = filtered.length;
+
+            if (filtered.length === 0) {
+                grid.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+            grid.innerHTML = filtered.map(item => {
+                const isSaved = state.savedIds.includes(item.id);
+                // Distinct Pink for SMA/SMK, Green for Kuliah
+                const levelBadgeClass = item.level === 'SMA/SMK'
+                    ? 'bg-bloomPink-100 text-bloomPink-700 border-bloomPink-200'
+                    : 'bg-bloomGreen-100 text-bloomGreen-700 border-bloomGreen-200';
+                
+                const fundingBadgeClass = item.funding === 'Fully Funded'
+                    ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                    : 'bg-pink-50 text-pink-700 border-pink-200';
+
+                const statusClass = item.status === 'Segera Tutup'
+                    ? 'text-rose-600 bg-rose-50'
+                    : 'text-bloomGreen-700 bg-bloomGreen-50';
+
+                return `
+                <article class="bg-white rounded-2xl border border-slate-200/80 p-6 flex flex-col justify-between card-hover relative overflow-hidden">
+                    <!-- Top accent bar -->
+                    <div class="absolute top-0 left-0 right-0 h-1 ${item.level === 'SMA/SMK' ? 'bg-bloomPink-500' : 'bg-bloomGreen-500'}"></div>
+
+                    <div>
+                        <!-- Badges Row -->
+                        <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+                            <div class="flex flex-wrap gap-1.5">
+                                <span class="px-2.5 py-1 rounded-lg text-xs font-bold border ${levelBadgeClass}">
+                                    ${item.level}
+                                </span>
+                                <span class="px-2.5 py-1 rounded-lg text-xs font-semibold border ${fundingBadgeClass}">
+                                    ${item.funding}
+                                </span>
+                            </div>
+                            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold ${statusClass}">
+                                ● ${item.status}
+                            </span>
+                        </div>
+
+                        <!-- Title & Provider -->
+                        <h3 onclick="openDetailModal('${item.id}')" class="font-display font-bold text-lg text-slate-900 hover:text-bloomPink-600 cursor-pointer transition-colors leading-snug mb-1.5">
+                            ${item.title}
+                        </h3>
+                        <p class="text-xs font-semibold text-slate-500 flex items-center gap-1.5 mb-3">
+                            <i data-lucide="building-2" class="w-3.5 h-3.5 text-slate-400"></i>
+                            ${item.provider} • <span class="text-slate-700">${item.scope}</span>
+                        </p>
+
+                        <!-- Summary -->
+                        <p class="text-sm text-slate-600 line-clamp-2 mb-4 leading-relaxed">
+                            ${item.summary}
+                        </p>
+
+                        <!-- Highlight Benefit -->
+                        <div class="bg-slate-50 rounded-xl p-3 mb-5 border border-slate-100">
+                            <p class="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">Benefit Utama:</p>
+                            <p class="text-xs font-medium text-slate-700 flex items-start gap-1.5">
+                                <i data-lucide="check-circle-2" class="w-4 h-4 text-bloomGreen-500 shrink-0 mt-0.5"></i>
+                                <span>${item.benefits[0]}</span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Footer: Deadline & Actions -->
+                    <div class="pt-4 border-t border-slate-100 flex items-center justify-between gap-2">
+                        <div>
+                            <span class="block text-[10px] font-bold uppercase text-slate-400">Deadline</span>
+                            <span class="text-xs font-bold text-slate-800 flex items-center gap-1">
+                                <i data-lucide="clock" class="w-3.5 h-3.5 text-bloomPink-500"></i>
+                                ${item.deadlineText}
+                            </span>
+                        </div>
+
+                        <div class="flex items-center gap-2">
+                            <button onclick="toggleSaveScholarship('${item.id}')" title="Simpan Beasiswa"
+                                    class="p-2.5 rounded-xl border ${isSaved ? 'bg-bloomPink-50 border-bloomPink-300 text-bloomPink-600' : 'bg-white border-slate-200 text-slate-500 hover:text-bloomPink-600 hover:border-bloomPink-200'} transition-colors">
+                                <i data-lucide="bookmark" class="w-4 h-4 ${isSaved ? 'fill-bloomPink-500' : ''}"></i>
+                            </button>
+                            <button onclick="openDetailModal('${item.id}')" 
+                                    class="px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-gradient-to-r hover:from-bloomPink-500 hover:to-bloomGreen-500 text-white text-xs font-bold transition-all">
+                                Lihat Detail
+                            </button>
+                        </div>
+                    </div>
+                </article>
+                `;
+            }).join('');
+
+            lucide.createIcons();
+        }
+
+        // BOOKMARK / SAVE FUNCTIONALITY
+        function toggleSaveScholarship(id) {
+            const index = state.savedIds.indexOf(id);
+            if (index === -1) {
+                state.savedIds.push(id);
+                showToast('Beasiswa disimpan ke daftar favorit!', 'pink');
+            } else {
+                state.savedIds.splice(index, 1);
+                showToast('Beasiswa dihapus dari daftar tersimpan.', 'green');
+            }
+            localStorage.setItem('bloomedu_saved_scholarships', JSON.stringify(state.savedIds));
+            updateSavedBadge();
+            renderScholarships();
+        }
+
+        function updateSavedBadge() {
+            document.getElementById('saved-count-badge').textContent = state.savedIds.length;
+        }
+
+        function openSavedModal() {
+            const modal = document.getElementById('saved-modal');
+            const container = document.getElementById('saved-list-container');
+            
+            const savedItems = scholarshipsData.filter(s => state.savedIds.includes(s.id));
+
+            if (savedItems.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-10">
+                        <i data-lucide="bookmark" class="w-10 h-10 text-slate-300 mx-auto mb-2"></i>
+                        <p class="text-sm font-semibold text-slate-700">Belum ada beasiswa tersimpan</p>
+                        <p class="text-xs text-slate-500 mt-1">Klik ikon bookmark pada kartu beasiswa untuk menyimpannya di sini.</p>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = savedItems.map(item => `
+                    <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-center justify-between gap-3">
+                        <div>
+                            <span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-bloomPink-100 text-bloomPink-700">${item.level}</span>
+                            <h4 class="font-display font-bold text-sm text-slate-900 mt-1">${item.title}</h4>
+                            <p class="text-xs text-slate-500">Deadline: ${item.deadlineText}</p>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <button onclick="closeSavedModal(); openDetailModal('${item.id}')" class="px-3 py-1.5 rounded-lg bg-bloomGreen-500 hover:bg-bloomGreen-600 text-white text-xs font-bold">
+                                Detail
+                            </button>
+                            <button onclick="toggleSaveScholarship('${item.id}'); openSavedModal();" class="p-1.5 rounded-lg text-slate-400 hover:text-rose-600">
+                                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            modal.classList.remove('hidden');
+            lucide.createIcons();
+        }
+
+        function closeSavedModal() {
+            document.getElementById('saved-modal').classList.add('hidden');
+        }
+
+        // MODAL DETAIL BEASISWA
+        function openDetailModal(id) {
+            const item = scholarshipsData.find(s => s.id === id);
+            if (!item) return;
+
+            const modal = document.getElementById('detail-modal');
+            document.getElementById('modal-title').textContent = item.title;
+            document.getElementById('modal-provider').querySelector('span').textContent = item.provider;
+            document.getElementById('modal-deadline').textContent = item.deadlineText;
+            document.getElementById('modal-scope').textContent = item.scope;
+            document.getElementById('modal-funding').textContent = item.funding;
+            document.getElementById('modal-desc').textContent = item.summary;
+            document.getElementById('modal-apply-link').href = item.url;
+
+            // Badges
+            const levelClass = item.level === 'SMA/SMK' ? 'bg-bloomPink-500 text-white' : 'bg-bloomGreen-500 text-white';
+            document.getElementById('modal-badges').innerHTML = `
+                <span class="px-3 py-1 rounded-full text-xs font-bold ${levelClass}">${item.level}</span>
+                <span class="px-3 py-1 rounded-full text-xs font-bold bg-white text-slate-700 border border-slate-200">${item.status}</span>
+            `;
+
+            // Benefits
+            document.getElementById('modal-benefits').innerHTML = item.benefits.map(b => `
+                <li class="flex items-start gap-2 bg-bloomGreen-50/60 p-2.5 rounded-xl border border-bloomGreen-100">
+                    <i data-lucide="check" class="w-4 h-4 text-bloomGreen-600 shrink-0 mt-0.5"></i>
+                    <span class="text-xs sm:text-sm">${b}</span>
+                </li>
+            `).join('');
+
+            // Interactive Requirement Checklist per Scholarship
+            renderModalRequirements(item);
+
+            // Timeline
+            document.getElementById('modal-timeline').innerHTML = item.timeline.map(t => `
+                <div class="relative">
+                    <span class="absolute -left-[21px] top-1.5 w-2.5 h-2.5 rounded-full bg-bloomGreen-500 ring-4 ring-white"></span>
+                    <p class="text-xs font-bold text-slate-800">${t.step}</p>
+                    <p class="text-xs text-slate-500">${t.date}</p>
+                </div>
+            `).join('');
+
+            // Save button inside modal
+            const saveBtn = document.getElementById('modal-save-btn');
+            const updateModalSaveBtn = () => {
+                const isSaved = state.savedIds.includes(item.id);
+                saveBtn.innerHTML = isSaved 
+                    ? `<i data-lucide="bookmark" class="w-4 h-4 fill-bloomPink-500"></i><span>Tersimpan</span>`
+                    : `<i data-lucide="bookmark" class="w-4 h-4"></i><span>Simpan Beasiswa</span>`;
+                lucide.createIcons();
+            };
+            updateModalSaveBtn();
+            saveBtn.onclick = () => {
+                toggleSaveScholarship(item.id);
+                updateModalSaveBtn();
+            };
+
+            modal.classList.remove('hidden');
+            lucide.createIcons();
+        }
+
+        function renderModalRequirements(item) {
+            const container = document.getElementById('modal-requirements');
+            const checkedIndices = state.reqProgress[item.id] || [];
+            
+            document.getElementById('modal-req-progress').textContent = `${checkedIndices.length}/${item.requirements.length} Siap`;
+
+            container.innerHTML = item.requirements.map((req, idx) => {
+                const isChecked = checkedIndices.includes(idx);
+                return `
+                <label class="flex items-start gap-3 p-2.5 rounded-xl bg-white border ${isChecked ? 'border-bloomGreen-300 bg-bloomGreen-50/30' : 'border-slate-200/80'} cursor-pointer hover:border-bloomPink-300 transition-colors">
+                    <input type="checkbox" ${isChecked ? 'checked' : ''} onchange="toggleReqItem('${item.id}', ${idx})" 
+                           class="mt-0.5 w-4 h-4 rounded accent-bloomGreen-600 cursor-pointer">
+                    <span class="text-xs sm:text-sm ${isChecked ? 'line-through text-slate-400' : 'text-slate-700'}">${req}</span>
+                </label>
+                `;
+            }).join('');
+        }
+
+        function toggleReqItem(scholarshipId, index) {
+            if (!state.reqProgress[scholarshipId]) {
+                state.reqProgress[scholarshipId] = [];
+            }
+            const arr = state.reqProgress[scholarshipId];
+            const pos = arr.indexOf(index);
+            if (pos === -1) {
+                arr.push(index);
+            } else {
+                arr.splice(pos, 1);
+            }
+            localStorage.setItem('bloomedu_req_progress', JSON.stringify(state.reqProgress));
+            const item = scholarshipsData.find(s => s.id === scholarshipId);
+            if (item) renderModalRequirements(item);
+        }
+
+        function closeDetailModal() {
+            document.getElementById('detail-modal').classList.add('hidden');
+        }
+
+        // GLOBAL READINESS CHECKLIST CALCULATOR
+        function renderGlobalChecklist() {
+            const container = document.getElementById('global-checklist');
+            container.innerHTML = globalChecklistItems.map(doc => {
+                const isChecked = state.globalDocs.includes(doc.id);
+                return `
+                <label class="flex items-center gap-3 p-3 rounded-xl border ${isChecked ? 'bg-bloomGreen-50/60 border-bloomGreen-300' : 'bg-slate-50 border-slate-200/70'} cursor-pointer hover:border-bloomPink-300 transition-all">
+                    <input type="checkbox" ${isChecked ? 'checked' : ''} onchange="toggleGlobalDoc('${doc.id}')"
+                           class="w-4 h-4 rounded accent-bloomPink-500 cursor-pointer">
+                    <span class="text-xs sm:text-sm font-medium ${isChecked ? 'text-bloomGreen-800 font-semibold' : 'text-slate-700'}">${doc.label}</span>
+                </label>
+                `;
+            }).join('');
+
+            updateReadinessScore();
+        }
+
+        function toggleGlobalDoc(docId) {
+            const idx = state.globalDocs.indexOf(docId);
+            if (idx === -1) {
+                state.globalDocs.push(docId);
+            } else {
+                state.globalDocs.splice(idx, 1);
+            }
+            localStorage.setItem('bloomedu_global_docs', JSON.stringify(state.globalDocs));
+            renderGlobalChecklist();
+        }
+
+        function resetReadinessChecklist() {
+            state.globalDocs = [];
+            localStorage.setItem('bloomedu_global_docs', JSON.stringify([]));
+            renderGlobalChecklist();
+        }
+
+        function updateReadinessScore() {
+            const total = globalChecklistItems.length;
+            const checked = state.globalDocs.length;
+            const percent = Math.round((checked / total) * 100);
+
+            document.getElementById('readiness-percentage').textContent = `${percent}%`;
+            document.getElementById('readiness-bar').style.width = `${percent}%`;
+
+            const feedback = document.getElementById('readiness-feedback');
+            if (percent === 0) {
+                feedback.textContent = "Mulai centang dokumen di samping untuk mengukur kesiapanmu!";
+            } else if (percent < 50) {
+                feedback.textContent = "Langkah awal yang bagus! Segera lengkapi berkas dasar seperti CV dan rapor.";
+            } else if (percent < 100) {
+                feedback.textContent = "Hampir siap! Tinggal selangkah lagi untuk menaklukkan seleksi administrasi.";
+            } else {
+                feedback.textContent = "Luar biasa! Dokumenmu 100% siap untuk mendaftar berbagai beasiswa impian!";
+            }
+        }
+
+        // FAQ ACCORDION
+        function toggleAccordion(num) {
+            const content = document.getElementById(`acc-content-${num}`);
+            const icon = document.getElementById(`acc-icon-${num}`);
+            content.classList.toggle('hidden');
+            icon.classList.toggle('rotate-180');
+        }
+
+        // AI CONSULTATION MODAL
+        function openConsultModal() {
+            document.getElementById('consult-modal').classList.remove('hidden');
+        }
+
+        function closeConsultModal() {
+            document.getElementById('consult-modal').classList.add('hidden');
+        }
+
+        function generateAIRecommendation() {
+            const level = document.getElementById('ai-level').value;
+            const goal = document.getElementById('ai-goal').value;
+            const resultBox = document.getElementById('ai-result-box');
+            const resultList = document.getElementById('ai-result-list');
+
+            let matches = scholarshipsData.filter(s => s.level === level);
+            if (goal !== 'all') {
+                const specific = matches.filter(s => s.categoryTag === goal);
+                if (specific.length > 0) matches = specific;
+            }
+
+            resultList.innerHTML = matches.slice(0, 3).map(m => `
+                <div class="p-3 rounded-xl bg-gradient-to-r from-bloomPink-50 to-bloomGreen-50 border border-bloomPink-100 flex items-center justify-between gap-2">
+                    <div>
+                        <p class="font-display font-bold text-xs sm:text-sm text-slate-900">${m.title}</p>
+                        <p class="text-[11px] text-slate-600">${m.funding} • Deadline ${m.deadlineText}</p>
+                    </div>
+                    <button onclick="closeConsultModal(); openDetailModal('${m.id}')" class="px-3 py-1.5 rounded-lg bg-slate-900 text-white text-xs font-bold shrink-0">
+                        Buka
+                    </button>
+                </div>
+            `).join('');
+
+            resultBox.classList.remove('hidden');
+        }
+
+        // NEWSLETTER FORM
+        function handleNewsletter(e) {
+            e.preventDefault();
+            const emailInput = document.getElementById('newsletter-email');
+            if (emailInput.value) {
+                showToast(`Berhasil berlangganan info beasiswa ke ${emailInput.value}!`, 'green');
+                emailInput.value = '';
+            }
+        }
+
+        // Close modals on backdrop click
+        window.addEventListener('click', (e) => {
+            if (e.target.id === 'detail-modal') closeDetailModal();
+            if (e.target.id === 'saved-modal') closeSavedModal();
+            if (e.target.id === 'consult-modal') closeConsultModal();
+        });
+    </script>
+</body>
+</html>
